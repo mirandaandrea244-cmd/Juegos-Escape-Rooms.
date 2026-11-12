@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Feria Ágil · Escape Room de Metodologías Ágiles</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rye&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+  <style>
+/* styles.css · Feria roja y blanca */
+:root{--rojo:#c8102e;--rojo-o:#7a0f1a;--crema:#fff4e0;--blanco:#fffdf8;--oro:#ffc83d;--madera:#4a1410;--tinta:#3a0d10;
+ --titulo:"Rye","Rockwell Extra Bold","Georgia",serif;--cuerpo:"Nunito","Trebuchet MS",Verdana,sans-serif}
+*{box-sizing:border-box}
+html,body{min-height:100%;margin:0}
+body{font-family:var(--cuerpo);font-weight:600;color:var(--tinta);overflow-x:hidden;
+ background:radial-gradient(ellipse at 50% 25%,rgba(255,255,255,.6),transparent 65%),
+ repeating-linear-gradient(90deg,var(--rojo) 0 56px,var(--blanco) 56px 112px);background-attachment:fixed}
+[hidden]{display:none!important}
+.pantalla{min-height:100vh;display:flex;flex-direction:column;align-items:center;position:relative}
+:focus-visible{outline:4px solid #1d4ed8;outline-offset:3px}
+
+/* botones */
+.btn-feria{font-family:var(--titulo);font-size:clamp(1.2rem,4vw,1.8rem);color:var(--tinta);cursor:pointer;
+ background:linear-gradient(#ffe27a,var(--oro));border:4px solid var(--rojo-o);border-radius:999px;padding:.55em 1.3em;
+ box-shadow:0 7px 0 var(--rojo-o),0 12px 20px rgba(0,0,0,.3);transition:transform .12s;animation:latido 1.8s ease-in-out infinite}
+.btn-feria.azul{background:linear-gradient(#8fc2ff,#4a93f5);animation-delay:.9s}
+.btn-feria span{display:inline-block;margin-right:.2em}
+.btn-feria:hover{transform:translateY(-4px) rotate(-1.5deg)}
+.btn-feria:hover span{animation:salto .5s infinite}
+.btn-feria:active{transform:translateY(6px);box-shadow:0 1px 0 var(--rojo-o)}
+.btn-feria.chico{font-size:1.2rem;animation:none;margin-top:1.1rem}
+@keyframes latido{50%{transform:scale(1.06)}}
+@keyframes salto{50%{transform:translateY(-6px) rotate(8deg)}}
+.btn-mini{font:800 1rem var(--cuerpo);cursor:pointer;background:var(--blanco);color:var(--tinta);border:3px solid var(--rojo-o);
+ border-radius:999px;padding:.45rem .9rem;box-shadow:0 4px 0 var(--rojo-o)}
+.btn-mini:active{transform:translateY(3px);box-shadow:0 1px 0 var(--rojo-o)}
+.btn-mini:disabled{opacity:.4;cursor:default}
+
+/* banderines y globos de fondo */
+.banderines{display:flex;width:100%;position:absolute;top:0;left:0;filter:drop-shadow(0 3px 2px rgba(0,0,0,.3))}
+.banderines span{flex:1;height:46px;clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top;animation:ondea 2.6s ease-in-out infinite}
+.banderines span:nth-child(odd){animation-delay:.4s}
+@keyframes ondea{50%{transform:rotate(4deg)}}
+.globos-fondo{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.gf{position:absolute;bottom:-90px;width:44px;height:56px;border-radius:50% 50% 48% 48%;pointer-events:auto;cursor:pointer;
+ background:radial-gradient(circle at 32% 28%,rgba(255,255,255,.8) 0 10%,var(--c) 40%);animation:sube linear infinite}
+.gf::after{content:"";position:absolute;top:56px;left:21px;width:2px;height:34px;background:#7b6b63}
+@keyframes sube{to{transform:translateY(-115vh) translateX(30px)}}
+
+/* puesto */
+.puesto{width:min(780px,94vw);margin:70px auto 3vh;display:flex;flex-direction:column;align-items:center;position:relative;z-index:2}
+.toldo{display:flex;width:100%;height:100px;filter:drop-shadow(0 8px 6px rgba(0,0,0,.35))}
+.toldo span{flex:1;background:var(--rojo);border:3px solid var(--rojo-o);border-top:0;border-radius:0 0 999px 999px/0 0 44px 44px;
+ transform-origin:top;animation:ondeo 3.4s ease-in-out infinite}
+.toldo span:nth-child(even){background:var(--blanco);animation-delay:.25s}
+@keyframes ondeo{50%{transform:scaleY(1.08)}}
+.letrero{margin-top:1.2rem;width:94%;text-align:center;background:var(--madera);border:6px solid var(--oro);border-radius:18px;
+ padding:.9rem 1.2rem;box-shadow:0 10px 0 rgba(0,0,0,.25),0 0 40px rgba(255,200,61,.55);animation:cae .8s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes cae{from{transform:translateY(-60px) rotate(-4deg);opacity:0}}
+.letrero h1{margin:.5rem 0 0;font:400 clamp(2.6rem,10vw,5rem)/1 var(--titulo);color:var(--oro);
+ text-shadow:3px 3px 0 var(--rojo),6px 6px 0 var(--rojo-o),0 0 24px rgba(255,200,61,.8)}
+.letrero p{margin:.5rem 0 .6rem;color:var(--crema);font-size:clamp(1rem,3vw,1.25rem)}
+
+/* luces brillantes */
+.luces{display:flex;justify-content:space-between;cursor:pointer;padding:.3rem 0}
+.luces i{width:16px;height:16px;border-radius:50%;background:#fff2a8;box-shadow:0 0 12px 4px #ffd84a;animation:chase 1.2s steps(1) infinite}
+.luces i:nth-child(3n+1){animation-delay:0s}.luces i:nth-child(3n+2){animation-delay:.4s}.luces i:nth-child(3n){animation-delay:.8s}
+@keyframes chase{0%{opacity:1}33%{opacity:.2}66%{opacity:.2}}
+.luces:hover i{transform:scale(1.25)}
+.puesto.disco .luces i{animation-duration:.35s;animation-name:disco}
+@keyframes disco{0%{background:#ff4d6d;box-shadow:0 0 14px 5px #ff4d6d}25%{background:#4da3ff;box-shadow:0 0 14px 5px #4da3ff}
+ 50%{background:#5dff8f;box-shadow:0 0 14px 5px #5dff8f}75%{background:#ffe14d;box-shadow:0 0 14px 5px #ffe14d}100%{background:#d27bff;box-shadow:0 0 14px 5px #d27bff}}
+
+/* osos */
+.osos{display:flex;align-items:flex-end;justify-content:center;gap:clamp(.6rem,4vw,2.5rem);margin-top:1.2rem;padding:0 1rem 10px;width:92%;
+ background:linear-gradient(transparent 82%,#8a5a2b 82% 92%,#5a3a1a 92%);border-radius:10px}
+.oso{font-size:clamp(3.4rem,13vw,5.5rem);line-height:1;background:none;border:0;cursor:pointer;transform-origin:50% 100%;
+ filter:drop-shadow(0 6px 4px rgba(0,0,0,.3));animation:cabeceo 3s ease-in-out infinite}
+.oso.grande{font-size:clamp(4.6rem,18vw,7.5rem);animation-delay:.6s}
+.oso:hover{transform:scale(1.12) rotate(-6deg)}
+.oso.salta{animation:brinco .7s ease-out}
+@keyframes cabeceo{50%{transform:rotate(4deg)}}
+@keyframes brinco{30%{transform:translateY(-50px) rotate(-12deg) scale(1.1)}60%{transform:translateY(0) scaleY(.85)}100%{transform:none}}
+.corazon{position:fixed;pointer-events:none;z-index:80;font-size:1.6rem}
+
+.mostrador{margin-top:1rem;width:94%;text-align:center;background:var(--crema);border:5px solid var(--rojo-o);border-radius:18px;padding:1rem 1rem 1.6rem}
+.reglas{margin:0 0 1rem;font-size:1.1rem}
+.menu{display:flex;flex-wrap:wrap;gap:1.2rem;justify-content:center}
+
+/* barra superior de juego */
+.marcador{width:min(1000px,96vw);margin:1.2vh auto .8rem;display:flex;align-items:center;justify-content:space-between;gap:.6rem}
+.boleto{font:800 clamp(.95rem,2.8vw,1.3rem) var(--cuerpo);background:var(--oro);border:4px dashed var(--rojo-o);border-radius:10px;padding:.45rem 1rem;text-align:center}
+.carpa{width:min(1000px,96vw);margin:0 auto 3vh}
+.tablero{display:grid;grid-template-columns:repeat(5,1fr);gap:1.2rem .4rem;justify-items:center;padding:2.4rem 1rem 1.4rem;min-height:290px;
+ background:rgba(255,244,224,.94);border:6px solid var(--madera);border-radius:22px;box-shadow:inset 0 0 0 4px var(--oro),0 14px 26px rgba(0,0,0,.35)}
+.paginas{display:flex;align-items:center;justify-content:center;gap:1rem;margin-top:1rem}
+.puntos{display:flex;gap:.6rem}
+.punto{width:42px;height:42px;border-radius:50%;font:800 1.1rem var(--cuerpo);cursor:pointer;background:var(--blanco);border:3px solid var(--rojo-o);color:var(--tinta)}
+.punto.activo{background:var(--rojo);color:#fff;transform:scale(1.15)}
+.punto.completa{background:#2ecc71;color:#fff}
+
+/* globos */
+.globo{--c:#e63946;--luz:#ff8a94;--sombra:#9b1c28;position:relative;width:84px;height:150px;padding:0;border:0;background:none;
+ animation:flota 3.2s ease-in-out infinite;animation-delay:var(--d,0s);transform-origin:50% 100%}
+.globo .cuerpo{position:absolute;top:0;left:0;width:84px;height:104px;border-radius:50% 50% 48% 48%/56% 56% 44% 44%;
+ background:radial-gradient(circle at 32% 28%,var(--luz) 0 12%,var(--c) 42%,var(--sombra) 100%);box-shadow:inset -6px -8px 14px rgba(0,0,0,.18);
+ display:flex;align-items:center;justify-content:center;font:400 1.9rem var(--titulo);color:#fff;text-shadow:0 2px 0 rgba(0,0,0,.35);transition:transform .15s}
+.globo:hover .cuerpo,.globo:focus-visible .cuerpo{transform:scale(1.08)}
+.globo .nudo{position:absolute;top:102px;left:36px;border:6px solid transparent;border-bottom:10px solid var(--sombra);border-top:0}
+.globo .cuerda{position:absolute;top:111px;left:41px;width:2px;height:38px;background:#7b6b63;transform:rotate(3deg);transform-origin:top}
+@keyframes flota{0%,100%{transform:translateY(0) rotate(-2.5deg)}50%{transform:translateY(-9px) rotate(2.5deg)}}
+.globo.explota{pointer-events:none;animation:none}
+.globo.explota .cuerpo{animation:revienta .22s ease-out forwards}
+.globo.explota .nudo,.globo.explota .cuerda{animation:caer .6s ease-in forwards}
+@keyframes revienta{40%{transform:scale(1.35)}100%{transform:scale(1.7);opacity:0}}
+@keyframes caer{to{transform:translateY(60px) rotate(40deg);opacity:0}}
+.globo.reventado{visibility:hidden}
+.trozo{position:fixed;width:10px;height:10px;border-radius:2px;pointer-events:none;z-index:40}
+
+/* alfiler */
+#alfiler{position:fixed;left:0;top:0;z-index:70;pointer-events:none;display:none}
+#alfiler.pinchando svg{animation:pincha .18s ease-out}
+@keyframes pincha{40%{transform:translate(-8px,-8px) scale(1.15)}}
+@media (pointer:fine){body.jugando-globos,body.jugando-globos *{cursor:none}body.jugando-globos #alfiler{display:block}}
+#confeti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:90}
+
+/* quiz */
+.quiz-caja{background:rgba(255,244,224,.95);border:6px solid var(--madera);border-radius:22px;padding:1.4rem;box-shadow:inset 0 0 0 4px var(--oro),0 14px 26px rgba(0,0,0,.35)}
+.barra{height:16px;background:#e8d5b5;border:3px solid var(--rojo-o);border-radius:99px;overflow:hidden}
+#barra-t{height:100%;width:100%;background:linear-gradient(90deg,#2ecc71,#ffc107,#e63946);background-size:300% 100%;transition:width .1s linear}
+.quiz-caja h2{font:400 clamp(1.4rem,4.5vw,2rem)/1.25 var(--titulo);color:var(--rojo-o);margin:1.2rem 0;text-align:center}
+.opciones{display:grid;grid-template-columns:1fr 1fr;gap:.9rem}
+.op{font:800 clamp(.95rem,2.6vw,1.15rem) var(--cuerpo);text-align:left;color:var(--tinta);cursor:pointer;min-height:76px;padding:.8rem 1rem;
+ background:var(--blanco);border:4px solid var(--rojo-o);border-radius:14px;box-shadow:0 5px 0 var(--rojo-o);transition:transform .1s;animation:entra .4s both}
+.op:nth-child(2){animation-delay:.07s}.op:nth-child(3){animation-delay:.14s}.op:nth-child(4){animation-delay:.21s}
+@keyframes entra{from{transform:translateY(16px);opacity:0}}
+.op:hover:not(:disabled){transform:translateY(-3px);background:#fff3c4}
+.op:disabled{cursor:default}
+.op.bien{background:#7be39f;border-color:#157a3e;animation:brinco2 .5s}
+.op.mal{background:#ff9aa2;border-color:#9b1c28;animation:tiembla .4s}
+@keyframes brinco2{40%{transform:scale(1.05)}}
+@keyframes tiembla{25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.aviso{text-align:center;min-height:1.6rem;margin:1rem 0 0;font-weight:800}
+
+/* tarjetas */
+.modal{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:1rem;background:rgba(58,13,16,.72)}
+.ticket{width:min(560px,100%);max-height:94vh;overflow:auto;text-align:center;background:var(--crema);border:6px solid var(--oro);border-radius:22px;
+ outline:5px dashed var(--rojo);outline-offset:-18px;padding:2.2rem 2rem 1.8rem;box-shadow:0 0 0 6px var(--rojo-o),0 24px 50px rgba(0,0,0,.5);
+ animation:ticket-in .45s cubic-bezier(.2,1.5,.4,1) both}
+@keyframes ticket-in{from{transform:scale(.4) rotate(-8deg);opacity:0}}
+.ticket h2{margin:0 0 1rem;font:400 clamp(1.4rem,5vw,1.9rem)/1.2 var(--titulo);color:var(--rojo-o)}
+.ticket-texto{font-size:clamp(1.05rem,3.4vw,1.2rem);line-height:1.6;text-align:left;max-width:44ch;margin:0 auto}
+.ticket-texto p{margin:0 0 .7rem}
+.sello{font-size:4rem;animation:gira .9s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes gira{from{transform:scale(0) rotate(-360deg)}}
+#final .ticket-texto{text-align:center}
+.menu-fin{display:block;margin:1rem auto 0}
+
+@media (max-width:640px){
+ .tablero{grid-template-columns:repeat(3,1fr)}
+ .opciones{grid-template-columns:1fr}
+ .toldo{height:70px}.ticket{padding:2rem 1.2rem 1.4rem}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+
+</style>
+</head>
+<body>
+  <canvas id="confeti" aria-hidden="true"></canvas>
+  <div id="alfiler" aria-hidden="true"><svg viewBox="0 0 56 56" width="56" height="56">
+    <line x1="3" y1="3" x2="36" y2="36" stroke="#cfd4da" stroke-width="3.5" stroke-linecap="round"/>
+    <circle cx="42" cy="42" r="12" fill="#e63946" stroke="#7a0f1a" stroke-width="2"/>
+    <circle cx="38.5" cy="38.5" r="3.5" fill="#ff9aa2"/></svg></div>
+
+  <!-- INICIO -->
+  <section id="inicio" class="pantalla">
+    <div class="banderines" id="banderines" aria-hidden="true"></div>
+    <div class="globos-fondo" id="globos-fondo" aria-hidden="true"></div>
+    <div class="puesto">
+      <div class="toldo" id="toldo" aria-hidden="true"></div>
+      <div class="letrero">
+        <div class="luces" data-luces="14"></div>
+        <h1>Feria Ágil</h1>
+        <p>Escape room de Metodologías Ágiles</p>
+        <div class="luces" data-luces="14"></div>
+      </div>
+      <div class="osos">
+        <button class="oso" aria-label="Oso de peluche">🧸</button>
+        <button class="oso grande" aria-label="Oso de peluche grande">🧸</button>
+        <button class="oso" aria-label="Oso de peluche">🧸</button>
+      </div>
+      <div class="mostrador">
+        <p class="reglas">Toca los osos y las luces, y elige un juego de la feria:</p>
+        <div class="menu">
+          <button id="btn-globos" class="btn-feria"><span>🎈</span> Revienta globos</button>
+          <button id="btn-quiz" class="btn-feria azul"><span>⚡</span> Preguntas rápidas</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JUEGO 1: GLOBOS -->
+  <section id="juego" class="pantalla" hidden>
+    <header class="marcador">
+      <button class="btn-mini btn-inicio">🎪 Inicio</button>
+      <div class="boleto" aria-live="polite">Globos: <strong id="contador">0</strong> / <strong id="total">20</strong></div>
+      <button id="btn-sonido" class="btn-mini" aria-pressed="true" aria-label="Sonido">🔊</button>
+    </header>
+    <main class="carpa">
+      <div id="tablero" class="tablero"></div>
+      <nav class="paginas" aria-label="Páginas">
+        <button id="pag-ant" class="btn-mini">◀</button>
+        <div id="puntos" class="puntos"></div>
+        <button id="pag-sig" class="btn-mini">▶</button>
+      </nav>
+    </main>
+  </section>
+
+  <!-- JUEGO 2: QUIZ -->
+  <section id="quiz" class="pantalla" hidden>
+    <header class="marcador">
+      <button class="btn-mini btn-inicio">🎪 Inicio</button>
+      <div class="boleto" aria-live="polite">Pregunta <strong id="q-num">1</strong> / <strong id="q-tot">10</strong> · ⭐ <strong id="q-pts">0</strong></div>
+      <button class="btn-mini" id="btn-sonido2" aria-label="Sonido">🔊</button>
+    </header>
+    <main class="carpa quiz-caja">
+      <div class="barra"><div id="barra-t"></div></div>
+      <h2 id="q-texto"></h2>
+      <div id="q-opciones" class="opciones"></div>
+      <p id="q-aviso" class="aviso" aria-live="polite"></p>
+    </main>
+  </section>
+
+  <!-- INFO AL REVENTAR -->
+  <div id="info" class="modal" role="dialog" aria-modal="true" aria-labelledby="info-titulo" hidden>
+    <article class="ticket">
+      <h2 id="info-titulo"></h2>
+      <div id="info-texto" class="ticket-texto"></div>
+      <button id="btn-seguir" class="btn-feria chico">Seguir jugando</button>
+    </article>
+  </div>
+
+  <!-- FINAL / WIN -->
+  <div id="final" class="modal" role="dialog" aria-modal="true" aria-labelledby="final-titulo" hidden>
+    <article class="ticket">
+      <div class="sello" id="final-emoji">🏆</div>
+      <h2 id="final-titulo"></h2>
+      <p class="ticket-texto" id="final-texto"></p>
+      <button id="btn-otra" class="btn-feria chico">Jugar otra vez</button>
+      <button id="btn-menu" class="btn-mini menu-fin">🎪 Volver al inicio</button>
+    </article>
+  </div>
+
+  <script>
+/* datos.js · p=pregunta, pq=pregunta para el quiz (opcional), r=explicación (líneas),
+   c=respuesta correcta corta, x=3 respuestas incorrectas */
+const COLORES_GLOBOS = [
+  { nombre:"rojo",     base:"#e63946", luz:"#ff8a94", sombra:"#9b1c28" },
+  { nombre:"azul",     base:"#2f80ed", luz:"#8fbcff", sombra:"#1a52a3" },
+  { nombre:"amarillo", base:"#ffc107", luz:"#ffe58a", sombra:"#b88700" },
+  { nombre:"verde",    base:"#2ecc71", luz:"#8ff0b9", sombra:"#1b8a4b" },
+  { nombre:"morado",   base:"#8e44ad", luz:"#c993e0", sombra:"#5b2a73" },
+  { nombre:"rosa",     base:"#ff6fa8", luz:"#ffb4d2", sombra:"#c23a71" }
+];
+const GLOBOS = [
+ {p:"¿Qué son las metodologías ágiles?",
+  r:["Son enfoques para gestionar proyectos en ciclos cortos.","Entregan valor de forma continua y se adaptan al cambio.","Dan prioridad a la colaboración con el cliente."],
+  c:"Trabajar en ciclos cortos, adaptándose al cambio",x:["Planear todo al inicio y no modificarlo","Documentar cada fase antes de avanzar","Trabajar sin equipo ni cliente"]},
+ {p:"¿Qué es el Manifiesto Ágil?",
+  r:["Es un documento creado en 2001 por 17 especialistas en software.","Define 4 valores y 12 principios para trabajar de forma ágil."],
+  c:"Documento de 2001 con 4 valores y 12 principios",x:["Un contrato legal entre cliente y proveedor","Un manual de programación en Java","Un plan de 10 años de una empresa"]},
+ {p:"¿Cuáles son los cuatro valores del Manifiesto Ágil?",pq:"¿Cuál es uno de los valores del Manifiesto Ágil?",
+  r:["Individuos e interacciones sobre procesos y herramientas.","Software funcionando sobre documentación exhaustiva.","Colaboración con el cliente sobre negociación contractual.","Respuesta ante el cambio sobre seguir un plan."],
+  c:"Software funcionando sobre documentación exhaustiva",x:["Procesos y herramientas sobre individuos","Seguir un plan sobre responder al cambio","Negociación de contratos sobre colaboración"]},
+ {p:"¿Qué es Scrum?",
+  r:["Es un marco de trabajo ágil para desarrollar productos complejos en equipo.","Usa iteraciones cortas llamadas Sprints, con roles, eventos y artefactos definidos."],
+  c:"Un marco ágil con Sprints, roles y eventos",x:["Un lenguaje de programación","Un tablero de columnas sin roles","Un software para facturar"]},
+ {p:"¿Cuáles son los roles de Scrum?",pq:"¿Cuál NO es un rol de Scrum?",
+  r:["Product Owner.","Scrum Master.","Equipo de Desarrollo (Developers)."],
+  c:"Gerente de Proyecto",x:["Product Owner","Scrum Master","Equipo de Desarrollo"]},
+ {p:"¿Qué es un Sprint?",
+  r:["Es una iteración de duración fija, de 1 a 4 semanas.","Al terminar, el equipo entrega un incremento del producto usable."],
+  c:"Una iteración de duración fija que entrega un incremento",x:["Una reunión diaria de 15 minutos","La lista de requisitos del producto","La junta final con el cliente"]},
+ {p:"¿Qué es un Product Owner?",
+  r:["Es el responsable de maximizar el valor del producto.","Representa a clientes y usuarios y prioriza el Product Backlog."],
+  c:"Quien maximiza el valor del producto y prioriza el backlog",x:["Quien facilita las reuniones del equipo","Quien programa todo el código","Quien paga el proyecto"]},
+ {p:"¿Cuál es la función del Scrum Master?",
+  r:["Facilita que el equipo aplique Scrum y elimina impedimentos.","Protege al equipo de interrupciones. Es un líder servidor, no un jefe."],
+  c:"Facilita Scrum y elimina impedimentos del equipo",x:["Asigna tareas y vigila a cada persona","Decide qué funciones se construyen","Escribe todas las pruebas"]},
+ {p:"¿Qué es Kanban?",
+  r:["Es un método visual para gestionar el flujo de trabajo, nacido en Toyota.","Limita el trabajo en curso (WIP) y busca la mejora continua."],
+  c:"Un método visual que limita el trabajo en curso (WIP)",x:["Un rol de Scrum","Una técnica de programación en parejas","Un tipo de reunión semanal"]},
+ {p:"¿Para qué sirve un tablero Kanban?",
+  r:["Muestra las tareas en columnas: Por hacer, En proceso y Hecho.","Ayuda a detectar cuellos de botella y da transparencia al avance."],
+  c:"Visualizar el flujo de trabajo y detectar cuellos de botella",x:["Guardar las contraseñas del equipo","Medir las horas trabajadas","Escribir código automáticamente"]},
+ {p:"¿Qué son las historias de usuario?",
+  r:["Son descripciones breves de una funcionalidad, escritas desde el punto de vista del usuario.","Expresan qué necesita y para qué."],
+  c:"Descripciones breves de una función desde el usuario",x:["Cuentos sobre la historia de la empresa","Diagramas de base de datos","Informes de errores"]},
+ {p:"¿Cuál es la estructura de una historia de usuario?",
+  r:["Como [rol], quiero [acción o funcionalidad], para [beneficio]."],
+  c:"Como [rol], quiero [acción], para [beneficio]",x:["Dado [contexto], cuando [evento], entonces [resultado]","Quién, cuándo, dónde y cuánto","Título, autor, fecha y resumen"]},
+ {p:"¿Qué son los criterios de aceptación?",
+  r:["Son condiciones claras y verificables.","Una historia de usuario se considera terminada cuando las cumple."],
+  c:"Condiciones verificables para dar por terminada una historia",x:["Reglas de comportamiento del equipo","Las metas de ventas del año","Los horarios de las reuniones"]},
+ {p:"¿Qué es el Product Backlog?",
+  r:["Es la lista ordenada y priorizada de todo lo que el producto podría necesitar.","Incluye funcionalidades, mejoras y correcciones. Lo gestiona el Product Owner."],
+  c:"Lista priorizada de todo lo que necesita el producto",x:["Tareas que el equipo hará este Sprint","El registro de errores resueltos","El acta de la retrospectiva"]},
+ {p:"¿Qué es el Sprint Backlog?",
+  r:["Son los elementos del Product Backlog elegidos para el Sprint.","Incluye el plan del equipo para convertirlos en un incremento terminado."],
+  c:"Los elementos elegidos para el Sprint más su plan",x:["Todas las ideas futuras del producto","La lista de roles del equipo","El producto final entregado al cliente"]},
+ {p:"¿Qué es la reunión Daily Scrum?",
+  r:["Es una reunión diaria de máximo 15 minutos.","Sirve para sincronizar al equipo, planear el día y detectar impedimentos."],
+  c:"Una reunión diaria de máximo 15 minutos",x:["Una reunión mensual de planeación","Una reunión de 2 horas con el cliente","Una reunión al cierre del Sprint"]},
+ {p:"¿Qué es la retrospectiva del Sprint?",
+  r:["Es el evento al final del Sprint donde el equipo revisa qué salió bien y qué puede mejorar.","Termina con acciones concretas de mejora continua."],
+  c:"Un evento al final del Sprint para mejorar como equipo",x:["La demo del producto a los clientes","La planeación del siguiente Sprint","La reunión para priorizar el backlog"]},
+ {p:"¿Qué es XP en metodologías ágiles?",
+  r:["XP significa Extreme Programming.","Se enfoca en la calidad técnica con programación en parejas, pruebas automáticas (TDD), integración continua y entregas pequeñas y frecuentes."],
+  c:"Extreme Programming, con programación en parejas y TDD",x:["Un sistema operativo extra","Un método sin pruebas ni equipo","Un estándar de diseño gráfico"]},
+ {p:"¿Qué es el desarrollo iterativo e incremental?",
+  r:["El producto se construye en ciclos repetidos (iterativo).","Cada ciclo agrega una parte funcional nueva (incremental) y mejora con la retroalimentación."],
+  c:"Construir por ciclos, agregando partes funcionales",x:["Entregar todo el producto al final","Repetir el mismo trabajo sin cambios","Desarrollar sin retroalimentación"]},
+ {p:"¿Cuál es el objetivo principal de las metodologías ágiles?",
+  r:["Entregar valor al cliente de forma temprana y continua.","Se logra adaptándose a los cambios mediante colaboración y mejora constante."],
+  c:"Entregar valor al cliente de forma temprana y continua",x:["Reducir el equipo al mínimo","Documentar al máximo cada fase","Evitar cambios durante el proyecto"]}
+];
+
+</script>
+  <script>
+/* juego.js · pantallas, globos paginados, quiz, sonidos y confeti */
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const PAG = 5, TOTAL_PAG = Math.ceil(GLOBOS.length / PAG), RONDA = 10, SEG = 15;
+  let sonido = true, reventados = new Set(), pagina = 0;
+
+  /* ---------- Decoración del inicio ---------- */
+  const COL = COLORES_GLOBOS.map(c => c.base);
+  $("banderines").innerHTML = Array.from({length: 18}, (_, i) => `<span style="background:${COL[i % 6]}"></span>`).join("");
+  $("toldo").innerHTML = "<span></span>".repeat(12);
+  document.querySelectorAll(".luces").forEach(l => l.innerHTML = "<i></i>".repeat(+l.dataset.luces));
+  $("total").textContent = GLOBOS.length;
+  $("q-tot").textContent = RONDA;
+
+  /* ---------- Sonidos (Web Audio) ---------- */
+  let ctx;
+  const audio = () => { ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); if (ctx.state === "suspended") ctx.resume(); return ctx; };
+  function nota(f, t, dur, tipo = "triangle", vol = .28) {
+    const a = audio(), o = a.createOscillator(), g = a.createGain();
+    o.type = tipo; o.frequency.value = f;
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .02); g.gain.exponentialRampToValueAtTime(.001, t + dur);
+    o.connect(g).connect(a.destination); o.start(t); o.stop(t + dur + .05);
+  }
+  function pop() {
+    if (!sonido) return;
+    const a = audio(), t = a.currentTime, n = a.sampleRate * .12, b = a.createBuffer(1, n, a.sampleRate), d = b.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / n, 3);
+    const s = a.createBufferSource(), g = a.createGain(); s.buffer = b; g.gain.setValueAtTime(.9, t); g.gain.exponentialRampToValueAtTime(.001, t + .12);
+    s.connect(g).connect(a.destination); s.start(t);
+    const o = a.createOscillator(), og = a.createGain();
+    o.frequency.setValueAtTime(220, t); o.frequency.exponentialRampToValueAtTime(50, t + .12);
+    og.gain.setValueAtTime(.7, t); og.gain.exponentialRampToValueAtTime(.001, t + .15); o.connect(og).connect(a.destination); o.start(t); o.stop(t + .16);
+  }
+  function win() { // fanfarria de victoria
+    if (!sonido) return;
+    const t = audio().currentTime + .05;
+    [[523, 0], [523, .14], [523, .28], [659, .42], [784, .62], [659, .82], [784, .98], [1047, 1.2]]
+      .forEach(([f, d]) => { nota(f, t + d, d === 1.2 ? .9 : .2, "square", .12); nota(f / 2, t + d, d === 1.2 ? .9 : .2, "triangle", .16); });
+  }
+  const bien = () => { if (sonido) { const t = audio().currentTime; nota(659, t, .15); nota(880, t + .1, .25); } };
+  const mal = () => { if (sonido) { const t = audio().currentTime; nota(220, t, .2, "sawtooth", .12); nota(165, t + .15, .3, "sawtooth", .12); } };
+  function chillido() {
+    if (!sonido) return;
+    const a = audio(), t = a.currentTime, o = a.createOscillator(), g = a.createGain();
+    o.frequency.setValueAtTime(500, t); o.frequency.exponentialRampToValueAtTime(950, t + .1); o.frequency.exponentialRampToValueAtTime(700, t + .2);
+    g.gain.setValueAtTime(.25, t); g.gain.exponentialRampToValueAtTime(.001, t + .25); o.connect(g).connect(a.destination); o.start(t); o.stop(t + .26);
+  }
+  ["btn-sonido", "btn-sonido2"].forEach(id => $(id).addEventListener("click", () => {
+    sonido = !sonido; ["btn-sonido", "btn-sonido2"].forEach(i => $(i).textContent = sonido ? "🔊" : "🔇");
+  }));
+
+  /* ---------- Confeti ---------- */
+  const cv = $("confeti"), c2 = cv.getContext("2d"); let piezas = [], corre = false;
+  const resize = () => { cv.width = innerWidth; cv.height = innerHeight; }; addEventListener("resize", resize); resize();
+  function confeti(x, y, n = 90, f = 1) {
+    for (let i = 0; i < n; i++) {
+      const an = Math.random() * 6.28, v = (3 + Math.random() * 9) * f;
+      piezas.push({x, y, vx: Math.cos(an) * v, vy: Math.sin(an) * v - 4, w: 6 + Math.random() * 7, h: 4 + Math.random() * 6,
+        r: Math.random() * 6, vr: (Math.random() - .5) * .4, col: [...COL, "#fff"][(Math.random() * 7) | 0], vida: 90 + Math.random() * 70});
+    }
+    if (!corre) { corre = true; requestAnimationFrame(frame); }
+  }
+  function frame() {
+    c2.clearRect(0, 0, cv.width, cv.height); piezas = piezas.filter(p => p.vida > 0 && p.y < cv.height + 30);
+    for (const p of piezas) {
+      p.vy += .28; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr; p.vida--;
+      c2.save(); c2.translate(p.x, p.y); c2.rotate(p.r); c2.globalAlpha = Math.min(1, p.vida / 30); c2.fillStyle = p.col; c2.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); c2.restore();
+    }
+    if (piezas.length) requestAnimationFrame(frame); else { corre = false; c2.clearRect(0, 0, cv.width, cv.height); }
+  }
+  function trozos(x, y, color) {
+    for (let i = 0; i < 12; i++) {
+      const t = document.createElement("div"); t.className = "trozo"; t.style.cssText = `background:${color};left:${x}px;top:${y}px`; document.body.appendChild(t);
+      const an = i / 12 * 6.28, d = 50 + Math.random() * 60;
+      t.animate([{transform: "none", opacity: 1}, {transform: `translate(${Math.cos(an) * d}px,${Math.sin(an) * d + 30}px) rotate(${Math.random() * 540}deg)`, opacity: 0}],
+        {duration: 600 + Math.random() * 250, easing: "ease-out"}).onfinish = () => t.remove();
+    }
+  }
+
+  /* ---------- Inicio interactivo: osos, luces y globos de fondo ---------- */
+  document.querySelectorAll(".oso").forEach(o => o.addEventListener("click", e => {
+    o.classList.remove("salta"); void o.offsetWidth; o.classList.add("salta"); chillido();
+    const r = o.getBoundingClientRect();
+    for (let i = 0; i < 6; i++) {
+      const h = document.createElement("span"); h.className = "corazon"; h.textContent = ["💖", "💗", "✨", "⭐"][i % 4];
+      h.style.cssText = `left:${r.left + r.width / 2}px;top:${r.top}px`; document.body.appendChild(h);
+      h.animate([{transform: "none", opacity: 1}, {transform: `translate(${(Math.random() - .5) * 120}px,-${90 + Math.random() * 80}px) scale(1.4)`, opacity: 0}],
+        {duration: 1100, easing: "ease-out"}).onfinish = () => h.remove();
+    }
+  }));
+  document.querySelectorAll(".luces").forEach(l => l.addEventListener("click", () => {
+    const p = document.querySelector(".puesto"); p.classList.toggle("disco");
+    if (sonido) { const t = audio().currentTime; [784, 988, 1175].forEach((f, i) => nota(f, t + i * .07, .2)); }
+  }));
+  function globosFondo() {
+    const g = $("globos-fondo"); g.innerHTML = "";
+    for (let i = 0; i < 9; i++) {
+      const b = document.createElement("div"); b.className = "gf";
+      b.style.cssText = `left:${5 + i * 11}%;--c:${COL[i % 6]};animation-duration:${9 + (i * 3) % 7}s;animation-delay:${-i * 2}s`;
+      b.addEventListener("click", () => { const r = b.getBoundingClientRect(); pop(); trozos(r.left + 22, r.top + 28, COL[i % 6]); confeti(r.left + 22, r.top + 28, 40); b.remove(); });
+      g.appendChild(b);
+    }
+  }
+  globosFondo();
+
+  /* ---------- Navegación ---------- */
+  const pantallas = ["inicio", "juego", "quiz"];
+  function ir(id) {
+    pantallas.forEach(p => $(p).hidden = p !== id);
+    $("info").hidden = $("final").hidden = true;
+    document.body.classList.toggle("jugando-globos", id === "juego");
+    if (id === "inicio") globosFondo();
+    scrollTo(0, 0);
+  }
+  document.querySelectorAll(".btn-inicio").forEach(b => b.addEventListener("click", () => ir("inicio")));
+  $("btn-menu").addEventListener("click", () => ir("inicio"));
+  $("btn-globos").addEventListener("click", () => { audio(); reventados.clear(); pagina = 0; ir("juego"); dibujar(); });
+  $("btn-quiz").addEventListener("click", () => { audio(); ir("quiz"); iniciarQuiz(); });
+
+  /* ============ JUEGO 1: GLOBOS (5 por página, 4 páginas) ============ */
+  function dibujar() {
+    const t = $("tablero"); t.innerHTML = ""; $("contador").textContent = reventados.size;
+    for (let k = 0; k < PAG; k++) {
+      const i = pagina * PAG + k, col = COLORES_GLOBOS[i % 6], b = document.createElement("button");
+      b.className = "globo" + (reventados.has(i) ? " reventado" : ""); b.type = "button";
+      b.setAttribute("aria-label", `Globo ${i + 1}, ${col.nombre}`);
+      b.style.cssText = `--c:${col.base};--luz:${col.luz};--sombra:${col.sombra};--d:${-k * .5}s`;
+      b.innerHTML = `<span class="cuerpo">${i + 1}</span><span class="nudo"></span><span class="cuerda"></span>`;
+      b.addEventListener("click", () => reventar(b, i, col));
+      t.appendChild(b);
+    }
+    $("puntos").innerHTML = Array.from({length: TOTAL_PAG}, (_, p) => {
+      const hechos = [...Array(PAG).keys()].every(k => reventados.has(p * PAG + k));
+      return `<button class="punto${p === pagina ? " activo" : ""}${hechos ? " completa" : ""}" data-p="${p}" aria-label="Página ${p + 1}">${p + 1}</button>`;
+    }).join("");
+    $("pag-ant").disabled = pagina === 0; $("pag-sig").disabled = pagina === TOTAL_PAG - 1;
+  }
+  $("puntos").addEventListener("click", e => { if (e.target.dataset.p) { pagina = +e.target.dataset.p; dibujar(); } });
+  $("pag-ant").addEventListener("click", () => { pagina--; dibujar(); });
+  $("pag-sig").addEventListener("click", () => { pagina++; dibujar(); });
+
+  function reventar(b, i, col) {
+    if (b.classList.contains("explota")) return;
+    const r = b.querySelector(".cuerpo").getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+    b.classList.add("explota"); pop(); trozos(x, y, col.base); confeti(x, y, 80);
+    const al = $("alfiler"); al.classList.remove("pinchando"); void al.offsetWidth; al.classList.add("pinchando");
+    reventados.add(i); $("contador").textContent = reventados.size;
+    setTimeout(() => mostrarInfo(i), 380);
+  }
+  function mostrarInfo(i) {
+    $("info-titulo").textContent = GLOBOS[i].p;
+    $("info-texto").innerHTML = GLOBOS[i].r.map(l => `<p>${l}</p>`).join("");
+    $("info").hidden = false; $("btn-seguir").focus();
+  }
+  $("btn-seguir").addEventListener("click", () => {
+    $("info").hidden = true; dibujar();
+    if (reventados.size === GLOBOS.length) terminar("🏆", "¡Ganaste!", "Reventaste los 20 globos y repasaste todos los conceptos de metodologías ágiles. ¡Excelente trabajo!", "globos");
+  });
+  addEventListener("keydown", e => { if (e.key === "Escape" && !$("info").hidden) $("btn-seguir").click(); });
+
+  /* ============ JUEGO 2: PREGUNTAS RÁPIDAS ============ */
+  let ronda = [], qi = 0, pts = 0, resp = false, reloj;
+  const mezclar = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+  function iniciarQuiz() { ronda = mezclar(GLOBOS).slice(0, RONDA); qi = 0; pts = 0; mostrarPregunta(); }
+  function mostrarPregunta() {
+    const q = ronda[qi]; resp = false;
+    $("q-num").textContent = qi + 1; $("q-pts").textContent = pts; $("q-aviso").textContent = "";
+    $("q-texto").textContent = q.pq || q.p;
+    $("q-opciones").innerHTML = "";
+    mezclar([q.c, ...q.x]).forEach(txt => {
+      const b = document.createElement("button"); b.className = "op"; b.textContent = txt; b.dataset.ok = txt === q.c;
+      b.addEventListener("click", () => responder(b)); $("q-opciones").appendChild(b);
+    });
+    let t = SEG * 10; $("barra-t").style.width = "100%"; clearInterval(reloj);
+    reloj = setInterval(() => { t--; $("barra-t").style.width = (t / (SEG * 10) * 100) + "%"; if (t <= 0) responder(null); }, 100);
+  }
+  function responder(b) {
+    if (resp) return; resp = true; clearInterval(reloj);
+    const botones = [...document.querySelectorAll(".op")]; botones.forEach(x => { x.disabled = true; if (x.dataset.ok === "true") x.classList.add("bien"); });
+    if (b && b.dataset.ok === "true") {
+      pts++; bien(); $("q-aviso").textContent = "¡Correcto! 🎉"; const r = b.getBoundingClientRect(); confeti(r.left + r.width / 2, r.top, 40, .7);
+    } else {
+      mal(); if (b) b.classList.add("mal"); $("q-aviso").textContent = b ? "Casi… la correcta está en verde." : "¡Se acabó el tiempo! ⏰";
+    }
+    $("q-pts").textContent = pts;
+    setTimeout(() => { if (++qi < RONDA) mostrarPregunta(); else finQuiz(); }, 1800);
+  }
+  function finQuiz() {
+    clearInterval(reloj);
+    const g = pts >= 7;
+    terminar(g ? "🏆" : "💪", g ? `¡Ganaste! ${pts} de ${RONDA}` : `Lograste ${pts} de ${RONDA}`,
+      g ? "¡Dominas las metodologías ágiles! Eres de lo mejor de la feria." : "¡Buen intento! Con 7 aciertos ganas. Vuelve a intentarlo.", "quiz", g);
+  }
+
+  /* ---------- Pantalla final ---------- */
+  let modo = "globos";
+  function terminar(emoji, titulo, texto, m, gano = true) {
+    modo = m; $("final-emoji").textContent = emoji; $("final-titulo").textContent = titulo; $("final-texto").textContent = texto;
+    $("final").hidden = false; $("btn-otra").focus();
+    if (gano) { win(); confeti(innerWidth * .2, innerHeight * .4, 120, 1.4); confeti(innerWidth * .8, innerHeight * .4, 120, 1.4); setTimeout(() => confeti(innerWidth / 2, innerHeight * .3, 200, 1.6), 400); }
+    else mal();
+  }
+  $("btn-otra").addEventListener("click", () => { $("final").hidden = true; if (modo === "globos") { reventados.clear(); pagina = 0; dibujar(); } else iniciarQuiz(); });
+
+  addEventListener("pointermove", e => { $("alfiler").style.transform = `translate(${e.clientX - 3}px,${e.clientY - 3}px)`; });
+})();
+
+</script>
+</body>
+</html>
